@@ -2,6 +2,7 @@ const { downloadContentFromMessage } = require('@whiskeysockets/baileys');
 const fs = require('fs');
 const path = require('path');
 const { TelegraPh } = require('../lib/myfunc2');
+const { fetchBuffer } = require('../lib/myfunc2');
 
 module.exports = {
     command: 'telegraph',
@@ -27,9 +28,12 @@ module.exports = {
 
             await sock.sendMessage(chatId, { text: '⏳ Uploading to Telegraph...' }, { quoted: message });
 
+            // Download media
             const stream = await downloadContentFromMessage(quotedMsg[type], type.split('Message')[0]);
             let buffer = Buffer.from([]);
-            for await (const chunk of stream) buffer = Buffer.concat([buffer, chunk]);
+            for await (const chunk of stream) {
+                buffer = Buffer.concat([buffer, chunk]);
+            }
 
             const tempDir = path.join('./temp');
             if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
